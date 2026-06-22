@@ -22,6 +22,12 @@
 .env.*
 !.env.example
 
+# Backup archives of data/ (and videos/) — these contain the same TLS keystores,
+# truststore, and live database as data/, so they must never be committed.
+*.tgz
+*.tar.gz
+*.tar
+
 # ---------------------------------------------------------------------------
 # Local tooling / editor / OS noise
 # ---------------------------------------------------------------------------

@@ -125,22 +125,32 @@ Everything that defines your controller lives in `./data/`:
   secrets.**
 - `system.properties` — controller identity (`uuid`) and port config.
 
-To back up, stop the container and archive `./data/` (and `./videos/` if you
-want the footage). The files in `./data/` are owned by the in-container user
-(`PUID`/`PGID` 99/100) and `root`, and the keystores are not world-readable, so
-run the archive step as root:
+To back up, **stop the container first** so the MongoDB database is archived in a
+consistent state, then archive `./data/` (and `./videos/` if you want the
+footage). The files in `./data/` are owned by the in-container user (`PUID`/`PGID`
+99/100) and `root`, and the keystores are not world-readable, so run the archive
+step with `sudo` — this both reads the protected files and preserves their
+ownership in the archive. Run the steps in this order:
+
+```bash
+docker compose stop                                # 1. stop cleanly (don't back up a live DB)
+sudo tar czf unifi-video-data-backup.tgz data/     # 2. archive as root
+docker compose start                               # 3. bring it back up
+```
+
+Restore by stopping the container, extracting the archive into place with `sudo`
+(to preserve the original ownership), then starting again:
 
 ```bash
 docker compose stop
-sudo tar czf unifi-video-data-backup.tgz data/
+sudo tar xzf unifi-video-data-backup.tgz           # restores ./data/ in place
 docker compose start
 ```
 
-Restore by extracting the archive into place (also with `sudo`, to preserve the
-original ownership) before starting the container.
-
 > Because `./data/` contains private keys and a live database, it is git-ignored
-> and must **never** be committed or published.
+> and must **never** be committed or published. **The backup archive holds the
+> same secrets** — keep it off version control (the repo's `.gitignore` already
+> excludes `*.tgz`/`*.tar.gz`/`*.tar`) and store it somewhere secure.
 
 ## Troubleshooting
 
