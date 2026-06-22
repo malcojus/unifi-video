@@ -1,0 +1,37 @@
+services:
+  unifi-video-controller:
+    image: malcojus/unifi-video-controller-minimal:latest
+    container_name: unifi-video-controller
+    restart: unless-stopped
+    ports:
+      # UniFi Video uses its own TLS and several non-HTTP streaming ports, so it
+      # is published directly rather than behind a reverse proxy. Reach the web
+      # UI at https://<host-ip>:7443
+      - 1935:1935   # RTMP streaming
+      - 6666:6666   # live FLV
+      - 7004:7004   # device discovery / control
+      - 7080:7080   # HTTP web UI
+      - 7442:7442   # camera management
+      - 7443:7443   # HTTPS web UI
+      - 7444:7444   # live stream (HTTPS)
+      - 7445:7445   # live stream (WS)
+      - 7446:7446   # live stream (WSS)
+      - 7447:7447   # RTSP/RTMP recording
+    volumes:
+      # Application state: config, MongoDB, logs, TLS keystores. Keep this safe;
+      # it is the controller's identity and database.
+      - ./data:/var/lib/unifi-video
+      # Recordings, split out so footage can live on separate/larger storage.
+      - ./videos:/var/lib/unifi-video/videos
+    tmpfs:
+      # Scratch cache on tmpfs (RAM) to reduce disk wear. Paired with
+      # CREATE_TMPFS=no below so the entrypoint does not mount its own.
+      - /var/cache/unifi-video
+    environment:
+      - TZ=Etc/UTC            # change to your timezone, e.g. America/Toronto
+      - DEBUG=0               # set to 1 for verbose container logging
+      - CREATE_TMPFS=no       # tmpfs is provided by Compose above; do not duplicate
+    cap_add:
+      # Required so the controller can traverse/read the bind-mounted data dir
+      # owned by the in-container PUID/PGID (99/100) regardless of host perms.
+      - DAC_READ_SEARCH
