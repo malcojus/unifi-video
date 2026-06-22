@@ -22,6 +22,7 @@ This is a **deployment configuration**, not application source code:
 | `.gitignore`          | Keeps runtime data, recordings, and secrets out of git.        |
 | `README.md`           | This file.                                                     |
 | `LICENSE`             | MIT license for the config/docs in this repo.                  |
+| `TODO.md`             | Follow-ups — notably tracking down the image's source Dockerfile. |
 
 The container image (`malcojus/unifi-video-controller-minimal:latest`) is a
 prebuilt image published on Docker Hub; it is pulled, not built from this repo.
