@@ -149,7 +149,11 @@ Restore by extracting the archive into place before starting the container.
 
 ## License & disclaimer
 
+The deployment configuration and documentation in this repo are released under
+the [MIT License](LICENSE).
+
 UniFi Video and all related trademarks are property of Ubiquiti Inc. This repo
 contains only deployment configuration and documentation; it ships no Ubiquiti
-software. The packaged image is provided as-is for users keeping legacy UVC
-hardware running. No warranty; use at your own risk.
+software, which remains under Ubiquiti's own license terms. The packaged image
+is provided as-is for users keeping legacy UVC hardware running. No warranty;
+use at your own risk.
