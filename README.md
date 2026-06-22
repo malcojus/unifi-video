@@ -21,6 +21,7 @@ This is a **deployment configuration**, not application source code:
 | `docker-compose.yaml` | The deployment — ports, volumes, capabilities, env.            |
 | `.gitignore`          | Keeps runtime data, recordings, and secrets out of git.        |
 | `README.md`           | This file.                                                     |
+| `LICENSE`             | MIT license for the config/docs in this repo.                  |
 
 The container image (`malcojus/unifi-video-controller-minimal:latest`) is a
 prebuilt image published on Docker Hub; it is pulled, not built from this repo.
@@ -125,15 +126,18 @@ Everything that defines your controller lives in `./data/`:
 - `system.properties` — controller identity (`uuid`) and port config.
 
 To back up, stop the container and archive `./data/` (and `./videos/` if you
-want the footage):
+want the footage). The files in `./data/` are owned by the in-container user
+(`PUID`/`PGID` 99/100) and `root`, and the keystores are not world-readable, so
+run the archive step as root:
 
 ```bash
 docker compose stop
-tar czf unifi-video-data-backup.tgz data/
+sudo tar czf unifi-video-data-backup.tgz data/
 docker compose start
 ```
 
-Restore by extracting the archive into place before starting the container.
+Restore by extracting the archive into place (also with `sudo`, to preserve the
+original ownership) before starting the container.
 
 > Because `./data/` contains private keys and a live database, it is git-ignored
 > and must **never** be committed or published.
